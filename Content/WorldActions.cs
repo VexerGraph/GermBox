@@ -31,8 +31,7 @@ namespace GermBox.Content
 
         internal static bool pathogenEffect(BaseSimObject pTarget, WorldTile pTile = null)
         {
-            Pathogen pathogen;
-            PathogenManager.UnitToPathogen.TryGetValue(pTarget.id, out pathogen);
+            Pathogen pathogen = PathogenManager.GetPathogenById(pTarget.id);
 
             //Debug.Log(MapBox.instance.units.get(pTarget.id).name);
 
@@ -46,31 +45,55 @@ namespace GermBox.Content
                 pathogen.Stats.kills++;
                 pathogen.Stats.infected--;
             }
-            pTarget.a.spawnParticle(Toolbox.color_infected);
+            pTarget.a.spawnParticle(Toolbox.color_poisoned);
             pTarget.a.startShake(0.4f, 0.2f, pVertical: false);
 
             foreach (Actor actor in Finder.getUnitsFromChunk(pTile, 1, 6f))
             {
+                bool infectChanceSuccess = pathogen.ShouldInfect();
                 //Debug.Log(PathogenManager.pathogens.Last().Name());
-                if (pathogen.Hosts.Contains(actor.subspecies.id) && actor.current_tile.Type.is_biome && pTarget.id != actor.id && !PathogenManager.UnitToPathogen.ContainsKey(actor.id))
+                if (pathogen.CanInfect(actor) && infectChanceSuccess)
                 {
-                    if (pathogen.Biomes.Contains(actor.current_tile.getBiome().id))
+                    if (actor.addStatusEffect(pathogen.Id()))
                     {
-                        if (actor.addStatusEffect(pathogen.Id())) //we need to nerf this so it's a chance rather than just always
+                        PathogenManager.RegisterUnit(actor, pathogen);
+                        pathogen.Stats.infected++;
+                        actor.setStatsDirty();
+                        //actor.removeTrait("blessed");
+                        actor.startShake();
+                        actor.startColorEffect();
+                    }
+                }
+                else if (actor.subspecies != null && actor.current_tile.Type.is_biome && infectChanceSuccess) //something wrong with infect chance success
+                {
+                    if (pathogen.ShouldMutate() && !actor.hasStatus(pathogen.Id())) {
+                        Pathogen newPathogen = null;
+                        
+                        if (actor.subspecies.id == MapBox.instance.units.get(pTarget.id).subspecies.id && !pathogen.Biomes.Contains(actor.current_tile.getBiome().id)) //they share the same subspecies, but not the same biome
                         {
-                            //Debug.Log("Passed the infection to " + actor.name);
-                            PathogenManager.UnitToPathogen.Add(actor.id, pathogen);
-                            pathogen.Stats.infected++;
+                            if (actor.current_tile.Type.is_biome) newPathogen = pathogen.Mutate(actor.current_tile.getBiome());
+                            //Debug.Log("Biome: " + actor.current_tile.Type.biome_id);
+                        }
+                        else if (pathogen.Biomes.Contains(actor.current_tile.getBiome().id)) //they share the same biome, but not the same subspecies
+                        {
+                            if (actor.hasSubspecies()) newPathogen = pathogen.Mutate(actor.subspecies);
+                        }
+
+                        if (newPathogen == null) return false;
+
+                        if (actor.addStatusEffect(newPathogen.Id()))
+                        {
+                            Debug.Log("Passing pathogen " + newPathogen.Name() + ", mutated from " + pathogen.Name() + ", to " + actor.name);
+                            PathogenManager.RegisterUnit(actor, newPathogen);
+                            newPathogen.Stats.infected++;
                             actor.setStatsDirty();
                             //actor.removeTrait("blessed");
                             actor.startShake();
                             actor.startColorEffect();
                         }
                     }
-
                 }
             }
-
             return true;
         }
     }

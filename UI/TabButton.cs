@@ -37,6 +37,15 @@ namespace GermBox.UI
                 foreach (Pathogen pathogen in PathogenManager.pathogens)
                 {
                     Debug.Log("PATHOGEN: " + pathogen.Name() + ", KILLS: " + pathogen.Stats.kills + ", INFECTED: " + pathogen.Stats.infected);
+                    var hosts = new List<string>();
+                    foreach (long id in pathogen.Hosts)
+                    {
+                        //hosts.Add(MapBox.instance.subspecies.get(id).name); //this line is a problem if a host subspecies goes extinct
+                        var host = MapBox.instance.subspecies.get(id);
+
+                        if (host != null) hosts.Add(host.name);
+                    }
+                    Debug.Log("|        BIOMES: " + string.Join(", ", pathogen.Biomes) + "| HOSTS: " + string.Join(", ", hosts));
                 }
             }
             ), SpriteTextureLoader.getSprite("ui/icons/iconStatistics"))); //will eventually be changed to a window button.

@@ -3,16 +3,18 @@ using GermBox.Pathogens;
 using NeoModLoader.General.Game.extensions;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using static UnityEngine.GraphicsBuffer;
+using static UnityEngine.UI.CanvasScaler;
 
 namespace GermBox.Core
 {
     internal class PathogenManager
     {
         public static List<Pathogen> pathogens = new();
-        public static Dictionary<long, Pathogen> UnitToPathogen = new();
+        private static Dictionary<long, Pathogen> UnitToPathogen = new();
 
         public static void CreatePathogen(Actor unit)
         {
@@ -38,6 +40,24 @@ namespace GermBox.Core
             pathogens.Add(pathogen);
         }
 
+        public static Pathogen Clone(Pathogen parent)
+        {
+            Pathogen pathogen = new Pathogen();
+            //pathogen.Stats.infected++;
+            pathogen.genus = parent.genus;
+            pathogen.Biomes = new HashSet<string>(parent.Biomes);
+            pathogen.species = parent.species; //AssetManager.biome_library.get(pathogen.Biomes.GetRandom()).subspecies_name_suffix.GetRandom<string>();
+            pathogen.Hosts = new HashSet<long>(parent.Hosts);
+
+            pathogen.numeral = Pathogens.NameGenerator.IntToRoman(PathogenManager.pathogens.FindAll(match => match.genus == parent.genus && match.species == parent.species).Count + 1);
+
+            //CreateStatus(pathogen);
+            //pathogens.Add(pathogen);
+            //handle these methods outside
+
+            return pathogen;
+        }
+
         public static void CreateStatus(Pathogen pathogen)
         {
             StatusAsset status = new StatusAsset();
@@ -52,20 +72,32 @@ namespace GermBox.Core
 
             AssetManager.status.add(status);
 
-            status.base_stats["multiplier_damage"] = -0.3f;
+            status.base_stats["multiplier_damage"] = -0.3f; //these will be controlled by symptoms eventually
             status.base_stats["multiplier_health"] = -0.3f;
 
             LocalizedTextManager.add(status.locale_id, pathogen.Name());
             LocalizedTextManager.add(status.locale_description, "Suffering from a contagious pathogen.");
         }
 
-        public static Pathogen GetPathogenById(string id)
+        public static bool RegisterUnit(Actor unit, Pathogen pathogen)
         {
-            foreach (Pathogen pathogen in pathogens)
-            {
-                if (pathogen.Id() == id) return pathogen;
+            if (!UnitToPathogen.ContainsKey(unit.id)) {
+                UnitToPathogen.Add(unit.id, pathogen);
+                return true;
             }
-            return null;
+            else if (UnitToPathogen.ContainsKey(unit.id) && UnitToPathogen[unit.id] != pathogen)
+            {
+                //remove the unit's previous status effect
+                UnitToPathogen[unit.id] = pathogen;
+                return true;
+            }
+            return false;
+        }
+
+        public static Pathogen GetPathogenById(long id)
+        {
+            UnitToPathogen.TryGetValue(id, out Pathogen pathogen);
+            return pathogen;
         }
     }
 }

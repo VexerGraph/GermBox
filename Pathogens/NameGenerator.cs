@@ -19,11 +19,11 @@ namespace GermBox.Pathogens
 
             // Sample Latin-like genus roots and suffixes
         static string[] genusRoots = {
-            "Toxi", "Morb", "Bacter", "Viro", "Patho", "Crypt", "Myco", "Necr", "Septic", "Infec", "Babu", "Beta"
+            "Toxi", "Morb", "Bacter", "Viro", "Patho", "Crypt", "Myco", "Necro", "Septic", "Infec", "Babu", "Beta", "Meti"
         };
 
         static string[] genusSuffixes = {
-            "coccus", "bacter", "virus", "myces", "plasma", "spora", "cella", "phage", "monas", "cella", "influenzavirus", "satellite"
+            "coccus", "bacter", "virus", "myces", "plasma", "spora", "cella", "phage", "monas", "cella", "influenzavirus", "satellite", "florens", "mensa"
         };
 
             // Sample Latin-like species epithets
