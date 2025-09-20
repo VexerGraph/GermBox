@@ -14,13 +14,15 @@ namespace GermBox.Pathogens
         //public readonly string type;
         //public readonly float infectiousness;
         //public List<string> symptoms;
-        public List<string> Hosts; //list of the subspecies this pathogen can infect
-        public List<string> Biomes; //list of biomes the pathogen can spread in
+        public HashSet<long> Hosts; //list of the subspecies this pathogen can infect
+        public HashSet<string> Biomes; //list of biomes the pathogen can spread in
         public PathogenStats Stats;
 
         public Pathogen()
         {
             this.Stats = new PathogenStats(MapBox.instance.getCurWorldTime());
+            this.Hosts = new HashSet<long>();
+            this.Biomes = new HashSet<string>();
         }
 
         public Pathogen Mutate<T>(T mutation) //handles subspecies, biome, and unit types

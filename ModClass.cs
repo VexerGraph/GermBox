@@ -1,4 +1,6 @@
-﻿using NeoModLoader.api;
+﻿using GermBox.Content;
+using GermBox.UI;
+using NeoModLoader.api;
 
 namespace GermBox
 {
@@ -6,7 +8,9 @@ namespace GermBox
     {
         protected override void OnModLoad()
         {
-            
+            Drops.Init();
+            GodPowers.Init();
+            TabButton.Init();
         }
     }
 }

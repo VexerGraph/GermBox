@@ -1,9 +1,0 @@
-{
-    "Default": [
-        {
-            "Id": "WhatToSay",
-            "Type": "TEXT",
-            "TextVal": "Hello World!"
-        }
-    ]
-}
