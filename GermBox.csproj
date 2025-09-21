@@ -11,11 +11,13 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Content Include="icon.png" />
         <Content Include="Locales\en.json" />
         <Content Include="mod.json" />
     </ItemGroup>
     <ItemGroup>
+        <Reference Include="0Harmony">
+          <HintPath>..\..\worldbox_Data\StreamingAssets\mods\NML\Assemblies\0Harmony.dll</HintPath>
+        </Reference>
         <Reference Include="Assembly-CSharp">
             <HintPath Condition="Exists('..\..\worldbox_Data\StreamingAssets\mods\NML\Assembly-CSharp-Publicized.dll')">..\..\worldbox_Data\StreamingAssets\mods\NML\Assembly-CSharp-Publicized.dll</HintPath>
             <HintPath Condition="Exists('..\..\worldbox_Data\StreamingAssets\Mods\NML\Assembly-CSharp-Publicized.dll')">..\..\worldbox_Data\StreamingAssets\Mods\NML\Assembly-CSharp-Publicized.dll</HintPath>

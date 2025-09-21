@@ -1,5 +1,6 @@
 ﻿using GermBox.Content;
 using GermBox.Pathogens;
+using GermBox.UI;
 using NeoModLoader.General.Game.extensions;
 using System;
 using System.Collections.Generic;
@@ -14,7 +15,7 @@ namespace GermBox.Core
     internal class PathogenManager
     {
         public static List<Pathogen> pathogens = new();
-        private static Dictionary<long, Pathogen> UnitToPathogen = new();
+        //private static Dictionary<long, Pathogen> UnitToPathogen = new();
 
         public static void CreatePathogen(Actor unit)
         {
@@ -34,7 +35,7 @@ namespace GermBox.Core
 
             pathogen.numeral = "I";
 
-            if (!UnitToPathogen.ContainsKey(unit.id)) UnitToPathogen.Add(unit.id, pathogen);
+            //if (!UnitToPathogen.ContainsKey(unit.id)) UnitToPathogen.Add(unit.id, pathogen);
 
             CreateStatus(pathogen);
             pathogens.Add(pathogen);
@@ -63,41 +64,49 @@ namespace GermBox.Core
             StatusAsset status = new StatusAsset();
             status.id = pathogen.Id();
             status.locale_id = "status_title_"+pathogen.Id();
-            status.locale_description = "status_description_" + pathogen.Id();
-            status.duration = 360f;
+            status.locale_description = "status_description_default";//"status_description_" + pathogen.Id();
+            status.duration = 120f;
             status.allow_timer_reset = false;
             status.action = new WorldAction(WorldActions.pathogenEffect);
+            status.action_finish = new WorldAction(WorldActions.pathogenTimeout);
             status.action_interval = 1f;
-            status.path_icon = "ui/icons/achievements/achievements_plagueworld"; //eventually I'll make a recolored version of this
+            status.path_icon = Icons.Random();
 
             AssetManager.status.add(status);
 
-            status.base_stats["multiplier_damage"] = -0.3f; //these will be controlled by symptoms eventually
+            status.base_stats["multiplier_damage"] = -0.3f; //these will be controlled by symptoms eventually, and will be completely randomized
             status.base_stats["multiplier_health"] = -0.3f;
 
             LocalizedTextManager.add(status.locale_id, pathogen.Name());
-            LocalizedTextManager.add(status.locale_description, "Suffering from a contagious pathogen.");
+            //LocalizedTextManager.add(status.locale_description, "Suffering from a contagious pathogen.");
         }
 
-        public static bool RegisterUnit(Actor unit, Pathogen pathogen)
-        {
-            if (!UnitToPathogen.ContainsKey(unit.id)) {
-                UnitToPathogen.Add(unit.id, pathogen);
-                return true;
-            }
-            else if (UnitToPathogen.ContainsKey(unit.id) && UnitToPathogen[unit.id] != pathogen)
-            {
-                //remove the unit's previous status effect
-                UnitToPathogen[unit.id] = pathogen;
-                return true;
-            }
-            return false;
-        }
+        //public static bool RegisterUnit(Actor unit, Pathogen pathogen)
+        //{
+        //    if (!UnitToPathogen.ContainsKey(unit.id)) {
+        //        UnitToPathogen.Add(unit.id, pathogen);
+        //        return true;
+        //    }
+        //    else if (UnitToPathogen.ContainsKey(unit.id) && UnitToPathogen[unit.id] != pathogen)
+        //    {
+        //        //remove the unit's previous status effect
+        //        UnitToPathogen[unit.id] = pathogen;
+        //        return true;
+        //    }
+        //    return false;
+        //}
 
         public static Pathogen GetPathogenById(long id)
         {
-            UnitToPathogen.TryGetValue(id, out Pathogen pathogen);
-            return pathogen;
+            Actor unit = MapBox.instance.units.get(id);
+            foreach (Pathogen pathogen in pathogens)
+            {
+                if (unit.hasStatus(pathogen.Id()))
+                {
+                    return pathogen;
+                }
+            }
+            return null;
         }
     }
 }

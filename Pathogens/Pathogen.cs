@@ -43,7 +43,7 @@ namespace GermBox.Pathogens
         }
         public bool CanInfect(Actor unit)
         {
-            if (Hosts.Contains(unit.subspecies.id) && unit.current_tile.Type.is_biome && PathogenManager.GetPathogenById(unit.id) == null)
+            if (Hosts.Contains(unit.subspecies.id) && unit.current_tile.Type.is_biome && !unit.hasStatus(this.Id()))
             {
                 if (Biomes.Contains(unit.current_tile.getBiome().id))
                 {

@@ -43,7 +43,7 @@ namespace GermBox.Content
             else if (pTarget.getHealth() == 1) {
                 pTarget.getHit(pDamage, pAttackType: AttackType.Plague);
                 pathogen.Stats.kills++;
-                pathogen.Stats.infected--;
+                //pathogen.Stats.infected--;
             }
             pTarget.a.spawnParticle(Toolbox.color_poisoned);
             pTarget.a.startShake(0.4f, 0.2f, pVertical: false);
@@ -56,7 +56,7 @@ namespace GermBox.Content
                 {
                     if (actor.addStatusEffect(pathogen.Id()))
                     {
-                        PathogenManager.RegisterUnit(actor, pathogen);
+                        //PathogenManager.RegisterUnit(actor, pathogen);
                         pathogen.Stats.infected++;
                         actor.setStatsDirty();
                         //actor.removeTrait("blessed");
@@ -64,11 +64,12 @@ namespace GermBox.Content
                         actor.startColorEffect();
                     }
                 }
-                else if (actor.subspecies != null && actor.current_tile.Type.is_biome && infectChanceSuccess) //something wrong with infect chance success
+                else if (actor.subspecies != null && actor.current_tile.Type.is_biome && infectChanceSuccess)
                 {
+                   // Debug.Log("pathogen.ShouldMutate()=" + pathogen.ShouldMutate() + " actor.hasStatus(pathogen.Id())=" + actor.hasStatus(pathogen.Id()));
                     if (pathogen.ShouldMutate() && !actor.hasStatus(pathogen.Id())) {
                         Pathogen newPathogen = null;
-                        
+
                         if (actor.subspecies.id == MapBox.instance.units.get(pTarget.id).subspecies.id && !pathogen.Biomes.Contains(actor.current_tile.getBiome().id)) //they share the same subspecies, but not the same biome
                         {
                             if (actor.current_tile.Type.is_biome) newPathogen = pathogen.Mutate(actor.current_tile.getBiome());
@@ -84,7 +85,7 @@ namespace GermBox.Content
                         if (actor.addStatusEffect(newPathogen.Id()))
                         {
                             Debug.Log("Passing pathogen " + newPathogen.Name() + ", mutated from " + pathogen.Name() + ", to " + actor.name);
-                            PathogenManager.RegisterUnit(actor, newPathogen);
+                            //PathogenManager.RegisterUnit(actor, newPathogen);
                             newPathogen.Stats.infected++;
                             actor.setStatsDirty();
                             //actor.removeTrait("blessed");
@@ -94,6 +95,18 @@ namespace GermBox.Content
                     }
                 }
             }
+            return true;
+        }
+
+        internal static bool pathogenTimeout(BaseSimObject pTarget, WorldTile pTile)
+        {
+            Pathogen pathogen = PathogenManager.GetPathogenById(pTarget.id);
+            if (pathogen == null) return false;
+
+            pathogen.Stats.infected--;
+
+            //handle immunity check here
+
             return true;
         }
     }

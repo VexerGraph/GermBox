@@ -4,5 +4,5 @@
   "version": "0.5.0",
   "description": "Adds a deadly mutating pathogen to the game.",
   "RepoUrl": "https://github.com/VexerGraph/GermBox",
-  "iconPath": "icon.png"
+  "iconPath": "GameResources/ui/icons/iconBacteria.png"
 }

@@ -21,7 +21,7 @@ namespace GermBox.UI
         public static PowersTab tab;
 
         public static void Init() {
-            tab = TabManager.CreateTab("GermBox", "germbox_tab_name", "germbox_tab_description", SpriteTextureLoader.getSprite("ui/icons/achievements/achievements_plagueworld"));
+            tab = TabManager.CreateTab("GermBox", "germbox_tab_name", "germbox_tab_description", SpriteTextureLoader.getSprite("tab_pathogen"));
 
             tab.SetLayout(new List<string> { STATS, POWER });
 
@@ -36,7 +36,7 @@ namespace GermBox.UI
             {
                 foreach (Pathogen pathogen in PathogenManager.pathogens)
                 {
-                    Debug.Log("PATHOGEN: " + pathogen.Name() + ", KILLS: " + pathogen.Stats.kills + ", INFECTED: " + pathogen.Stats.infected);
+                    Debug.Log("PATHOGEN: " + pathogen.Name() + ", KILLS: " + pathogen.Stats.kills + ", INFECTED: " + pathogen.Stats.infected + ", Created: " + pathogen.Stats.GetAgo());
                     var hosts = new List<string>();
                     foreach (long id in pathogen.Hosts)
                     {
@@ -51,7 +51,7 @@ namespace GermBox.UI
             ), SpriteTextureLoader.getSprite("ui/icons/iconStatistics"))); //will eventually be changed to a window button.
 
             //the god power
-            tab.AddPowerButton(POWER, PowerButtonCreator.CreateGodPowerButton("pathogen_power", SpriteTextureLoader.getSprite("ui/icons/achievements/achievements_plagueworld")));
+            tab.AddPowerButton(POWER, PowerButtonCreator.CreateGodPowerButton("pathogen_power", SpriteTextureLoader.getSprite("ui/icons/iconBacteria")));
 
             //later on, a button to create your own pathogens
         }

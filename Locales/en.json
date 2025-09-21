@@ -6,5 +6,6 @@
   "germbox_stats": "Pathogen Stats",
   "germbox_stats_description": "Stats on the pathogens in this world (not implemented yet).",
   "pathogen_power": "Pathogen",
-  "pathogen_power_description":  "Drop a new pathogen."
+  "pathogen_power_description": "Drop a new pathogen.",
+  "status_description_default": "Suffering from a contagious pathogen."
 }

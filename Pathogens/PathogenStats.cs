@@ -17,9 +17,9 @@ namespace GermBox.Pathogens
             this.creationTime = creationTime;
         }
 
-        public double GetAge()
+        public string GetAgo()
         {
-            return creationTime;
+            return Date.getAgoString(creationTime);
         }
     }
 }
