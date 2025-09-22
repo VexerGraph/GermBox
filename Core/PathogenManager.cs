@@ -65,7 +65,7 @@ namespace GermBox.Core
             status.id = pathogen.Id();
             status.locale_id = "status_title_"+pathogen.Id();
             status.locale_description = "status_description_default";//"status_description_" + pathogen.Id();
-            status.duration = 120f;
+            status.duration = 120f; //default 120f
             status.allow_timer_reset = false;
             status.action = new WorldAction(WorldActions.pathogenEffect);
             status.action_finish = new WorldAction(WorldActions.pathogenTimeout);
@@ -80,21 +80,6 @@ namespace GermBox.Core
             LocalizedTextManager.add(status.locale_id, pathogen.Name());
             //LocalizedTextManager.add(status.locale_description, "Suffering from a contagious pathogen.");
         }
-
-        //public static bool RegisterUnit(Actor unit, Pathogen pathogen)
-        //{
-        //    if (!UnitToPathogen.ContainsKey(unit.id)) {
-        //        UnitToPathogen.Add(unit.id, pathogen);
-        //        return true;
-        //    }
-        //    else if (UnitToPathogen.ContainsKey(unit.id) && UnitToPathogen[unit.id] != pathogen)
-        //    {
-        //        //remove the unit's previous status effect
-        //        UnitToPathogen[unit.id] = pathogen;
-        //        return true;
-        //    }
-        //    return false;
-        //}
 
         public static Pathogen GetPathogenById(long id)
         {

@@ -20,18 +20,7 @@ namespace GermBox.Patches
                 pathogen.Stats.infected--;
                 if (pathogen.Stats.infected == 0)
                 {
-                    StatusAsset status = AssetManager.status.get(pathogen.Id());
-
-                    for (int i = 0; i < AssetManager.status.list.Count; i++) {
-                        if (AssetManager.status.list[i].id == status.id)
-                        {
-                           AssetManager.status.list.RemoveAt(i);
-                            break;
-                        }
-                        AssetManager.status.dict.Remove(status.id);
-                    }
-
-                    PathogenManager.pathogens.Remove(pathogen);
+                    pathogen.Destroy();
                 }
             }
         }

@@ -1,5 +1,6 @@
 ﻿using GermBox.Core;
 using GermBox.Pathogens;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -84,7 +85,7 @@ namespace GermBox.Content
 
                         if (actor.addStatusEffect(newPathogen.Id()))
                         {
-                            Debug.Log("Passing pathogen " + newPathogen.Name() + ", mutated from " + pathogen.Name() + ", to " + actor.name);
+                            //Debug.Log("Passing pathogen " + newPathogen.Name() + ", mutated from " + pathogen.Name() + ", to " + actor.name);
                             //PathogenManager.RegisterUnit(actor, newPathogen);
                             newPathogen.Stats.infected++;
                             actor.setStatsDirty();
@@ -105,7 +106,30 @@ namespace GermBox.Content
 
             pathogen.Stats.infected--;
 
+            if (pathogen.Stats.infected == 0)
+            {
+                pathogen.Destroy();
+                return true;
+            }
+
             //handle immunity check here
+            
+            if (Randy.randomChance(80))
+            {
+                //we will need a way to display unit immunities, an extra window on the unit perhaps?
+                HashSet<string> immunities = new() { pathogen.Id() };
+
+                pTarget.a.data.get("immunities", out string immunityData);
+
+                if (immunityData != null)
+                {
+                    var previousImmunities = JsonConvert.DeserializeObject<HashSet<string>>(immunityData);
+
+                    immunities.UnionWith(previousImmunities);
+                }
+
+                pTarget.a.data.set("immunities", JsonConvert.SerializeObject(immunities));
+            }
 
             return true;
         }

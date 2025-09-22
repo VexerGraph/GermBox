@@ -28,6 +28,9 @@
             <HintPath Condition="Exists('..\..\worldbox_Data\StreamingAssets\Mods\NeoModLoader_memload.dll')">..\..\worldbox_Data\StreamingAssets\Mods\NeoModLoader_memload.dll</HintPath>
             <HintPath Condition="Exists('..\..\worldbox_Data\StreamingAssets\Mods\NeoModLoader.dll')">..\..\worldbox_Data\StreamingAssets\Mods\NeoModLoader.dll</HintPath>
         </Reference>
+        <Reference Include="Newtonsoft.Json">
+          <HintPath>..\..\worldbox_Data\Managed\Newtonsoft.Json.dll</HintPath>
+        </Reference>
         <Reference Include="UnityEngine">
             <HintPath>..\..\worldbox_Data\Managed\UnityEngine.dll</HintPath>
         </Reference>

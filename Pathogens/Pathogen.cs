@@ -1,4 +1,5 @@
 ﻿using GermBox.Core;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -47,7 +48,16 @@ namespace GermBox.Pathogens
             {
                 if (Biomes.Contains(unit.current_tile.getBiome().id))
                 {
-                    return true;
+                    unit.data.get("immunities", out string immunityData);
+
+                    HashSet<string> immunities = new();
+
+                    if (immunityData != null)
+                    {
+                        immunities = JsonConvert.DeserializeObject<HashSet<string>>(immunityData);
+                    }  
+
+                    return !immunities.Contains(this.Id());
                 }
             }
             return false;
@@ -108,6 +118,23 @@ namespace GermBox.Pathogens
         }
         public string Id() { 
             return genus.ToLowerInvariant() + "_" + species.ToLowerInvariant() + "_" + numeral.ToLowerInvariant();
+        }
+
+        public void Destroy()
+        {
+            StatusAsset status = AssetManager.status.get(Id());
+
+            for (int i = 0; i < AssetManager.status.list.Count; i++)
+            {
+                if (AssetManager.status.list[i].id == status.id)
+                {
+                    AssetManager.status.list.RemoveAt(i);
+                    break;
+                }
+                AssetManager.status.dict.Remove(status.id);
+            }
+
+            PathogenManager.pathogens.Remove(this);
         }
     }
 }
