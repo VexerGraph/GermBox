@@ -16,21 +16,25 @@ namespace GermBox.Pathogens
         public string species;
         public string numeral;
         //public readonly string type;
-        private float infectiousness = 10f;
-        public List<string> symptoms;
+        private float infectiousness = 5f;
         public HashSet<long> Hosts; //list of the subspecies this pathogen can infect
         public HashSet<string> Biomes; //list of biomes the pathogen can spread in
         public PathogenStats Stats;
+
+        public float lifespan = 60f;
+
+        public Symptoms symptoms;
 
         public float mutation_chance = 10f;
 
         public Pathogen()
         {
-            this.Stats = new PathogenStats(MapBox.instance.getCurWorldTime());
-            this.Hosts = new HashSet<long>();
-            this.Biomes = new HashSet<string>() {"biome_sand", "biome_hill"};
+            Stats = new PathogenStats(MapBox.instance.getCurWorldTime());
+            Hosts = new HashSet<long>();
+            Biomes = new HashSet<string>() {"biome_sand", "biome_hill"};
+            lifespan = Randy.randomFloat(30f, 300f);
+            infectiousness = Randy.randomFloat(1f, 12f);
         }
-
         public bool ShouldMutate()
         {
             float random = Randy.randomFloat(0f, 100f);
@@ -72,10 +76,9 @@ namespace GermBox.Pathogens
             switch (Randy.randomBool())
             {
                 case true:
-                    newPathogen.mutation_chance = Math.Min(100f, newPathogen.mutation_chance + 2f);
+                    newPathogen.symptoms.AddNew();
                     break;
                 case false:
-                    newPathogen.mutation_chance = Math.Max(0f, newPathogen.mutation_chance - 2f);
                     break;
             }
             switch (Randy.randomBool())

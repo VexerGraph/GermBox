@@ -35,7 +35,8 @@ namespace GermBox.Core
 
             pathogen.numeral = "I";
 
-            //if (!UnitToPathogen.ContainsKey(unit.id)) UnitToPathogen.Add(unit.id, pathogen);
+            pathogen.symptoms = new Symptoms();
+
 
             CreateStatus(pathogen);
             pathogens.Add(pathogen);
@@ -49,12 +50,13 @@ namespace GermBox.Core
             pathogen.Biomes = new HashSet<string>(parent.Biomes);
             pathogen.species = parent.species; //AssetManager.biome_library.get(pathogen.Biomes.GetRandom()).subspecies_name_suffix.GetRandom<string>();
             pathogen.Hosts = new HashSet<long>(parent.Hosts);
+            pathogen.symptoms = new Symptoms(parent.symptoms);
+            pathogen.symptoms.effects = new List<string>(pathogen.symptoms.effects);
+            pathogen.symptoms.death_effect = parent.symptoms.death_effect;
+            
+            pathogen.lifespan = parent.lifespan;
 
             pathogen.numeral = Pathogens.NameGenerator.IntToRoman(PathogenManager.pathogens.FindAll(match => match.genus == parent.genus && match.species == parent.species).Count + 1);
-
-            //CreateStatus(pathogen);
-            //pathogens.Add(pathogen);
-            //handle these methods outside
 
             return pathogen;
         }
@@ -65,17 +67,22 @@ namespace GermBox.Core
             status.id = pathogen.Id();
             status.locale_id = "status_title_"+pathogen.Id();
             status.locale_description = "status_description_default";//"status_description_" + pathogen.Id();
-            status.duration = 120f; //default 120f
+            status.duration = pathogen.lifespan; //default 120f
             status.allow_timer_reset = false;
             status.action = new WorldAction(WorldActions.pathogenEffect);
             status.action_finish = new WorldAction(WorldActions.pathogenTimeout);
-            status.action_interval = 1f;
+            status.action_interval = 5f;
             status.path_icon = Icons.Random();
+
+            if (pathogen.symptoms.death_effect != null) { 
+                status.action_death = pathogen.symptoms.death_effect;
+            }
 
             AssetManager.status.add(status);
 
-            status.base_stats["multiplier_damage"] = -0.3f; //these will be controlled by symptoms eventually, and will be completely randomized
-            status.base_stats["multiplier_health"] = -0.3f;
+            // symptoms will include stat symptoms and active symptoms (physical damage taken, agression, etc.)
+
+            pathogen.symptoms.SetSymptoms(status.base_stats);
 
             LocalizedTextManager.add(status.locale_id, pathogen.Name());
             //LocalizedTextManager.add(status.locale_description, "Suffering from a contagious pathogen.");

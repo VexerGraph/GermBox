@@ -18,6 +18,10 @@ namespace GermBox.Patches
             Pathogen pathogen = PathogenManager.GetPathogenById(__instance.id);
             if (pathogen != null) {
                 pathogen.Stats.infected--;
+                if (__instance._last_attack_type == AttackType.Plague) //really I should be using my own attack type
+                {
+                    pathogen.Stats.kills++;
+                }
                 if (pathogen.Stats.infected == 0)
                 {
                     pathogen.Destroy();

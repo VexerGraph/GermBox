@@ -7,11 +7,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
 using static UnityEngine.UI.CanvasScaler;
 
 namespace GermBox.Content
 {
-    internal class WorldActions
+    public class WorldActions
     {
         internal static void ActionInfect(WorldTile pTile = null, string pDropID = null)
         {
@@ -38,14 +39,13 @@ namespace GermBox.Content
 
             if (pathogen == null) return false;
 
-            float pDamage = Mathf.Max((float)pTarget.getHealth() * 0.08f, 1f);
-            if (Randy.randomBool() && pTarget.getHealth() > 1)
-                pTarget.getHit(pDamage, pAttackType: AttackType.Plague);
-            else if (pTarget.getHealth() == 1) {
-                pTarget.getHit(pDamage, pAttackType: AttackType.Plague);
-                pathogen.Stats.kills++;
-                //pathogen.Stats.infected--;
+            #region Special Effects
+            foreach (string effectID in pathogen.symptoms.effects)
+            {
+                pathogen.symptoms.ApplyEffect(effectID, pTarget);
             }
+            #endregion
+
             pTarget.a.spawnParticle(Toolbox.color_poisoned);
             pTarget.a.startShake(0.4f, 0.2f, pVertical: false);
 
@@ -57,24 +57,21 @@ namespace GermBox.Content
                 {
                     if (actor.addStatusEffect(pathogen.Id()))
                     {
-                        //PathogenManager.RegisterUnit(actor, pathogen);
                         pathogen.Stats.infected++;
                         actor.setStatsDirty();
-                        //actor.removeTrait("blessed");
                         actor.startShake();
                         actor.startColorEffect();
                     }
                 }
+                #region Mutation
                 else if (actor.subspecies != null && actor.current_tile.Type.is_biome && infectChanceSuccess)
                 {
-                   // Debug.Log("pathogen.ShouldMutate()=" + pathogen.ShouldMutate() + " actor.hasStatus(pathogen.Id())=" + actor.hasStatus(pathogen.Id()));
                     if (pathogen.ShouldMutate() && !actor.hasStatus(pathogen.Id())) {
                         Pathogen newPathogen = null;
 
                         if (actor.subspecies.id == MapBox.instance.units.get(pTarget.id).subspecies.id && !pathogen.Biomes.Contains(actor.current_tile.getBiome().id)) //they share the same subspecies, but not the same biome
                         {
                             if (actor.current_tile.Type.is_biome) newPathogen = pathogen.Mutate(actor.current_tile.getBiome());
-                            //Debug.Log("Biome: " + actor.current_tile.Type.biome_id);
                         }
                         else if (pathogen.Biomes.Contains(actor.current_tile.getBiome().id)) //they share the same biome, but not the same subspecies
                         {
@@ -86,15 +83,14 @@ namespace GermBox.Content
                         if (actor.addStatusEffect(newPathogen.Id()))
                         {
                             //Debug.Log("Passing pathogen " + newPathogen.Name() + ", mutated from " + pathogen.Name() + ", to " + actor.name);
-                            //PathogenManager.RegisterUnit(actor, newPathogen);
                             newPathogen.Stats.infected++;
                             actor.setStatsDirty();
-                            //actor.removeTrait("blessed");
                             actor.startShake();
                             actor.startColorEffect();
                         }
                     }
                 }
+                #endregion
             }
             return true;
         }
@@ -131,6 +127,19 @@ namespace GermBox.Content
                 pTarget.a.data.set("immunities", JsonConvert.SerializeObject(immunities));
             }
 
+            return true;
+        }
+
+
+        //death actions
+        public static bool Antimatter(BaseSimObject pTarget, WorldTile pTile = null)
+        {
+            DropsLibrary.action_antimatter_bomb(pTile);
+            return true;
+        }
+        public static bool Coldone(BaseSimObject pTarget, WorldTile pTile = null)
+        {
+            ActionLibrary.turnIntoIceOne(pTarget);
             return true;
         }
     }
